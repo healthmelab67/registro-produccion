@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Ingreso de Datos</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .form-container { max-width: 500px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 0 auto; }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .form-group textarea { resize: vertical; height: 80px; }
+        .btn-submit { width: 100%; background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-submit:hover { background-color: #218838; }
+        #mensaje { display: none; text-align: center; padding: 10px; margin-top: 15px; font-weight: bold; border-radius: 4px; }
+        .exito { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Registro de Producción</h2>
+    
+    <form id="miFormulario" action="https://script.google.com/macros/s/AKfycbwBp9f1r5LE3D-Qo9OoAIGRPno2Kp7jIJDgczVBFAYpQUI4ucfdXtXE2trO70kqV1Lw/exec" method="POST">
+        
+        <div class="form-group">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" required>
+        </div>
+
+        <div class="form-group">
+            <label for="producto">Producto:</label>
+            <input type="text" id="producto" name="producto" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad">Cantidad Producida:</label>
+            <input type="number" id="cantidad" name="cantidad" min="0" step="any" required>
+        </div>
+
+        <div class="form-group">
+            <label for="producto_terminado">¿Producto Terminado?</label>
+            <select id="producto_terminado" name="producto_terminado" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cubetas">Número de Cubetas:</label>
+            <input type="number" id="cubetas" name="cubetas" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_inicial">Temperatura Inicial (Base) °C:</label>
+            <input type="number" id="temp_inicial" name="temp_inicial" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_intermedia">Temperatura Intermedia (Base) °C:</label>
+            <input type="number" id="temp_intermedia" name="temp_intermedia" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_final">Temperatura Final (Base) °C:</label>
+            <input type="number" id="temp_final" name="temp_final" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="comentarios">Comentarios:</label>
+            <textarea id="comentarios" name="comentarios"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnEnviar">Guardar Registro</button>
+    </form>
+    
+    <div id="mensaje"></div>
+</div>
+
+<script>
+    // 1. Poner la fecha actual automáticamente
+    window.addEventListener('DOMContentLoaded', () => {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        let mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        let dd = String(hoy.getDate()).padStart(2, '0');
+        document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
+    });
+
+    // 2. Enviar datos por AJAX para evitar que la página se redireccione
+    const formulario = document.getElementById('miFormulario');
+    const mensajeDiv = document.getElementById('mensaje');
+    const btnEnviar = document.getElementById('btnEnviar');
+
+    formulario.addEventListener('submit', function(e) {
+        e.preventDefault(); // Evita el envío tradicional
+        
+        btnEnviar.disabled = true;
+        btnEnviar.innerText = "Enviando...";
+        mensajeDiv.style.display = "none";
+
+        const datos = new FormData(formulario);
+
+        fetch(formulario.action, {
+            method: 'POST',
+            body: datos
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.result === 'success') {
+                mensajeDiv.innerText = "¡Datos guardados con éxito en Google Sheets!";
+                mensajeDiv.className = "exito";
+                mensajeDiv.style.display = "block";
+                
+                // Limpia el formulario (excepto la fecha)
+                formulario.reset();
+                window.dispatchEvent(new Event('DOMContentLoaded')); 
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(error => {
+            mensajeDiv.innerText = "Hubo un error al guardar los datos.";
+            mensajeDiv.className = "error";
+            mensajeDiv.style.display = "block";
+        })
+        .finally(() => {
+            btnEnviar.disabled = false;
+            btnEnviar.innerText = "Guardar Registro";
+        });
+    });
+</script>
+
+</body>
+</html>
