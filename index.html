@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Ingreso de Datos</title>
+    <title>Formulario de Ingreso de Datos con Evidencia</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
         .form-container { max-width: 500px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 0 auto; }
@@ -75,6 +75,11 @@
             <textarea id="comentarios" name="comentarios"></textarea>
         </div>
 
+        <div class="form-group">
+            <label for="archivo">Foto de Evidencia (Opcional):</label>
+            <input type="file" id="archivo" accept="image/*">
+        </div>
+
         <button type="submit" class="btn-submit" id="btnEnviar">Guardar Registro</button>
     </form>
     
@@ -91,47 +96,71 @@
         document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
     });
 
-    // 2. Enviar datos por AJAX para evitar que la página se redireccione
     const formulario = document.getElementById('miFormulario');
     const mensajeDiv = document.getElementById('mensaje');
     const btnEnviar = document.getElementById('btnEnviar');
+    const archivoInput = document.getElementById('archivo');
 
     formulario.addEventListener('submit', function(e) {
-        e.preventDefault(); // Evita el envío tradicional
+        e.preventDefault();
         
         btnEnviar.disabled = true;
-        btnEnviar.innerText = "Enviando...";
+        btnEnviar.innerText = "Subiendo datos e imagen...";
         mensajeDiv.style.display = "none";
 
         const datos = new FormData(formulario);
+        const archivo = archivoInput.files[0];
 
-        fetch(formulario.action, {
-            method: 'POST',
-            body: datos
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.result === 'success') {
-                mensajeDiv.innerText = "¡Datos guardados con éxito en Google Sheets!";
-                mensajeDiv.className = "exito";
-                mensajeDiv.style.display = "block";
-                
-                // Limpia el formulario (excepto la fecha)
-                formulario.reset();
-                window.dispatchEvent(new Event('DOMContentLoaded')); 
-            } else {
-                throw new Error();
+        // Función para enviar todo junto a Google
+        const enviarTodo = (base64Data = "", nombreArchivo = "") => {
+            if(base64Data) {
+                datos.append("archivoData", base64Data);
+                datos.append("archivoNombre", nombreArchivo);
             }
-        })
-        .catch(error => {
-            mensajeDiv.innerText = "Hubo un error al guardar los datos.";
-            mensajeDiv.className = "error";
-            mensajeDiv.style.display = "block";
-        })
-        .finally(() => {
-            btnEnviar.disabled = false;
-            btnEnviar.innerText = "Guardar Registro";
-        });
+
+            // Usamos una URLSearchParams para codificar correctamente el envío de la foto pesada
+            const urlEncoded = new URLSearchParams(datos);
+
+            fetch(formulario.action, {
+                method: 'POST',
+                body: urlEncoded,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    mensajeDiv.innerText = "¡Registro e imagen guardados con éxito!";
+                    mensajeDiv.className = "exito";
+                    mensajeDiv.style.display = "block";
+                    formulario.reset();
+                    window.dispatchEvent(new Event('DOMContentLoaded')); 
+                } else {
+                    throw new Error(data.error);
+                }
+            })
+            .catch(error => {
+                mensajeDiv.innerText = "Error al guardar el registro.";
+                mensajeDiv.className = "error";
+                mensajeDiv.style.display = "block";
+                console.error(error);
+            })
+            .finally(() => {
+                btnEnviar.disabled = false;
+                btnEnviar.innerText = "Guardar Registro";
+            });
+        };
+
+        // Si el usuario seleccionó un archivo, lo convertimos a Base64 antes de mandar
+        if (archivo) {
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                enviarTodo(reader.result, archivo.name);
+            };
+            reader.readAsDataURL(archivo);
+        } else {
+            // Si no hay foto, envía solo los datos de texto
+            enviarTodo();
+        }
     });
 </script>
 
