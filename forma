@@ -5,35 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario de Ingreso de Datos Health-me lab</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        /* Paleta de colores basada en Health-me lab */
+        :root {
+            --azul-oscuro: #0f2c59;      /* Azul corporativo principal */
+            --verde-medico: #00a896;     /* Verde turquesa de acento */
+            --azul-claro: #eef2f7;       /* Fondo suave */
+            --texto-oscuro: #333333;
+            --blanco: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: var(--azul-claro); 
+            padding: 20px;
+            margin: 0;
+            color: var(--texto-oscuro);
+        }
+
+        /* Contenedor del Logo */
+        .logo-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-header img {
+            max-width: 180px;
+            height: auto;
+        }
         
         /* Contenedor del Login */
-        .login-container { max-width: 400px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 100px auto 0 auto; text-align: center; }
+        .login-container { 
+            max-width: 400px; 
+            background: var(--blanco); 
+            padding: 35px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(15, 44, 89, 0.15); 
+            margin: 80px auto 0 auto; 
+        }
         
         /* Contenedor del Formulario (Oculto al inicio) */
-        .form-container { max-width: 500px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 0 auto; display: none; }
+        .form-container { 
+            max-width: 550px; 
+            background: var(--blanco); 
+            padding: 35px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(15, 44, 89, 0.15); 
+            margin: 20px auto; 
+            display: none; 
+        }
         
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .form-group textarea { resize: vertical; height: 80px; }
-        
-        .btn-submit { width: 100%; background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .btn-submit:hover { background-color: #218838; }
-        
-        .btn-login { width: 100%; background-color: #007bff; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        .btn-login:hover { background-color: #0056b3; }
+        h2 { 
+            text-align: center; 
+            color: var(--azul-oscuro); 
+            margin-top: 10px;
+            margin-bottom: 25px; 
+            font-weight: 700;
+        }
 
-        #mensaje, #login-error { display: none; text-align: center; padding: 10px; margin-top: 15px; font-weight: bold; border-radius: 4px; }
-        .exito { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--azul-oscuro); }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #dce2e9; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--verde-medico);
+        }
+        .form-group textarea { resize: vertical; height: 90px; }
+        
+        /* Botones Estilizados con los colores corporativos */
+        .btn-login { 
+            width: 100%; 
+            background-color: var(--azul-oscuro); 
+            color: white; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        .btn-login:hover { background-color: #0b1f40; }
+
+        .btn-submit { 
+            width: 100%; 
+            background-color: var(--verde-medico); 
+            color: white; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            transition: background 0.3s;
+        }
+        .btn-submit:hover { background-color: #008f80; }
+        
+        #mensaje, #login-error { display: none; text-align: center; padding: 12px; margin-top: 20px; font-weight: bold; border-radius: 6px; }
+        .exito { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="login-container" id="loginVista">
-    <h2>Health-me lab <br><span style="font-size: 14px; color:#777;">Control de Acceso</span></h2>
+    <div class="logo-header">
+        <img src="Logo_HT_HT4.png" alt="Logo_HT_HT4.png">
+    </div>
+    <h2>Control de Acceso</h2>
     <div class="form-group">
         <label for="login-user">Usuario:</label>
         <input type="text" id="login-user" placeholder="Ingresa tu usuario">
@@ -48,7 +134,10 @@
 
 
 <div class="form-container" id="formularioVista">
-    <h2>Registro de Producción Health-me lab</h2>
+    <div class="logo-header">
+        <img src="Logo_HT_HT4.png" alt="Health-me lab Logo">
+    </div>
+    <h2>Registro de Producción</h2>
     
     <form id="miFormulario" action="https://script.google.com/macros/s/AKfycbwBp9f1r5LE3D-Qo9OoAIGRPno2Kp7jIJDgczVBFAYpQUI4ucfdXtXE2trO70kqV1Lw/exec" method="POST">
         
@@ -110,7 +199,7 @@
 <script>
     // === LÓGICA DEL LOGIN ===
     const USUARIO_VALIDO = "admin";
-    const PASSWORD_VALIDO = "healthme2026"; // Cambia esto por tu contraseña preferida
+    const PASSWORD_VALIDO = "healthme2026"; // Cambia esta contraseña si lo deseas
 
     const loginVista = document.getElementById('loginVista');
     const formularioVista = document.getElementById('formularioVista');
@@ -122,11 +211,11 @@
         const pass = document.getElementById('login-pass').value;
 
         if (user === USUARIO_VALIDO && pass === PASSWORD_VALIDO) {
-            loginVista.style.display = 'none'; // Esconde el login
-            formularioVista.style.display = 'block'; // Muestra el formulario
-            inicializarFecha(); // Activa la fecha automática
+            loginVista.style.display = 'none'; 
+            formularioVista.style.display = 'block'; 
+            inicializarFecha(); 
         } else {
-            loginError.style.display = 'block'; // Muestra mensaje de error
+            loginError.style.display = 'block'; 
         }
     });
 
