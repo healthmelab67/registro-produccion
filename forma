@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Ingreso de Datos Health-me lab</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        
+        /* Contenedor del Login */
+        .login-container { max-width: 400px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 100px auto 0 auto; text-align: center; }
+        
+        /* Contenedor del Formulario (Oculto al inicio) */
+        .form-container { max-width: 500px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 0 auto; display: none; }
+        
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .form-group textarea { resize: vertical; height: 80px; }
+        
+        .btn-submit { width: 100%; background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-submit:hover { background-color: #218838; }
+        
+        .btn-login { width: 100%; background-color: #007bff; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .btn-login:hover { background-color: #0056b3; }
+
+        #mensaje, #login-error { display: none; text-align: center; padding: 10px; margin-top: 15px; font-weight: bold; border-radius: 4px; }
+        .exito { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="login-container" id="loginVista">
+    <h2>Health-me lab <br><span style="font-size: 14px; color:#777;">Control de Acceso</span></h2>
+    <div class="form-group">
+        <label for="login-user">Usuario:</label>
+        <input type="text" id="login-user" placeholder="Ingresa tu usuario">
+    </div>
+    <div class="form-group">
+        <label for="login-pass">Contraseña:</label>
+        <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+    </div>
+    <button class="btn-login" id="btnIngresar">Iniciar Sesión</button>
+    <div id="login-error" class="error">Usuario o contraseña incorrectos.</div>
+</div>
+
+
+<div class="form-container" id="formularioVista">
+    <h2>Registro de Producción Health-me lab</h2>
+    
+    <form id="miFormulario" action="https://script.google.com/macros/s/AKfycbwBp9f1r5LE3D-Qo9OoAIGRPno2Kp7jIJDgczVBFAYpQUI4ucfdXtXE2trO70kqV1Lw/exec" method="POST">
+        
+        <div class="form-group">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" required>
+        </div>
+
+        <div class="form-group">
+            <label for="producto">Producto:</label>
+            <input type="text" id="producto" name="producto" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad">Cantidad Producida:</label>
+            <input type="number" id="cantidad" name="cantidad" min="0" step="any" required>
+        </div>
+
+        <div class="form-group">
+            <label for="producto_terminado">¿Producto Terminado?</label>
+            <select id="producto_terminado" name="producto_terminado" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cubetas">Número de Cubetas:</label>
+            <input type="number" id="cubetas" name="cubetas" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_inicial">Temperatura Inicial (Base) °C:</label>
+            <input type="number" id="temp_inicial" name="temp_inicial" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_intermedia">Temperatura Intermedia (Base) °C:</label>
+            <input type="number" id="temp_intermedia" name="temp_intermedia" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="temp_final">Temperatura Final (Base) °C:</label>
+            <input type="number" id="temp_final" name="temp_final" step="0.1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="comentarios">Comentarios:</label>
+            <textarea id="comentarios" name="comentarios"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btnEnviar">Guardar Registro</button>
+    </form>
+    
+    <div id="mensaje"></div>
+</div>
+
+<script>
+    // === LÓGICA DEL LOGIN ===
+    const USUARIO_VALIDO = "admin";
+    const PASSWORD_VALIDO = "healthme2026"; // Cambia esto por tu contraseña preferida
+
+    const loginVista = document.getElementById('loginVista');
+    const formularioVista = document.getElementById('formularioVista');
+    const btnIngresar = document.getElementById('btnIngresar');
+    const loginError = document.getElementById('login-error');
+
+    btnIngresar.addEventListener('click', () => {
+        const user = document.getElementById('login-user').value;
+        const pass = document.getElementById('login-pass').value;
+
+        if (user === USUARIO_VALIDO && pass === PASSWORD_VALIDO) {
+            loginVista.style.display = 'none'; // Esconde el login
+            formularioVista.style.display = 'block'; // Muestra el formulario
+            inicializarFecha(); // Activa la fecha automática
+        } else {
+            loginError.style.display = 'block'; // Muestra mensaje de error
+        }
+    });
+
+    // === LÓGICA DEL FORMULARIO ORIGINAL ===
+    function inicializarFecha() {
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        let mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        let dd = String(hoy.getDate()).padStart(2, '0');
+        document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    const formulario = document.getElementById('miFormulario');
+    const mensajeDiv = document.getElementById('mensaje');
+    const btnEnviar = document.getElementById('btnEnviar');
+
+    formulario.addEventListener('submit', function(e) {
+        e.preventDefault(); 
+        
+        btnEnviar.disabled = true;
+        btnEnviar.innerText = "Enviando...";
+        mensajeDiv.style.display = "none";
+
+        const datos = new FormData(formulario);
+
+        fetch(formulario.action, {
+            method: 'POST',
+            body: datos
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.result === 'success') {
+                mensajeDiv.innerText = "¡Datos guardados con éxito en Google Sheets!";
+                mensajeDiv.className = "exito";
+                mensajeDiv.style.display = "block";
+                
+                formulario.reset();
+                inicializarFecha(); 
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(error => {
+            mensajeDiv.innerText = "Hubo un error al guardar los datos.";
+            mensajeDiv.className = "error";
+            mensajeDiv.style.display = "block";
+        })
+        .finally(() => {
+            btnEnviar.disabled = false;
+            btnEnviar.innerText = "Guardar Registro";
+        });
+    });
+</script>
+
+</body>
+</html>
